@@ -22,11 +22,7 @@ const app = express();
 
 // CORS
 const corsOptions = {
-  origin: [
-    "https://tradefrontend.netlify.app",
-    "http://localhost:3000",
-    "http://localhost:3001",
-  ],
+  origin: [process.env.FRONTEND_LINK, process.env.DASHBOARD_LINK],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 };
@@ -47,8 +43,7 @@ const store = MongoStore.create({
 app.use(
   session({
     secret:
-      process.env.SESSION_SECRET ||
-      "asgb24y82786!627367@97649219035CBHCSBJHQBCajniwuhfibkbgegxgr",
+      process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
@@ -73,8 +68,6 @@ app.use("/auth", userRoute);
 app.use("/", holdingRoute);
 app.use("/", PositionRoute);
 app.use("/", orderRoute);
-
-
 
 // Error handler
 app.use((err, req, res, next) => {
