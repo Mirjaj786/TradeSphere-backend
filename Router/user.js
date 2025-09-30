@@ -1,13 +1,12 @@
 const isProd = process.env.NODE_ENV === "production";
 
-
 const express = require("express");
 const router = express.Router();
-const User = require("../model/usersModel");
+const User = require("../model/usersModel.js");
 const passport = require("passport");
 
 // Register
-router.post("/auth/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -17,15 +16,18 @@ router.post("/auth/register", async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User registered succesfull", user: reguser });
+      .json({ message: "User registered successfully", user: reguser });
   } catch (err) {
-    console.log(err);
-    return res.status(400).json({ message: `something went worng ${err}` });
+    console.error(err);
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+    return res.status(400).json({ message: `Something went wrong: ${err}` });
   }
 });
 
 // Login
-router.post("/auth/login", (req, res, next) => {
+router.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       return res.status(500).json({ error: "Server error during login" });
@@ -43,6 +45,7 @@ router.post("/auth/login", (req, res, next) => {
         message: "Login successful",
         user: {
           id: user._id,
+          username: user.username,
           email: user.email,
         },
       });
@@ -51,14 +54,13 @@ router.post("/auth/login", (req, res, next) => {
 });
 
 // Logout
-router.post("/auth/logout", (req, res, next) => {
+router.post("/logout", (req, res, next) => {
   req.logout(function (err) {
     if (err) return next(err);
-
     req.session.destroy((err) => {
       if (err) return next(err);
 
-      res.clearCookie("sessionId", {
+      res.clearCookie("connect.sid", {
         path: "/",
         sameSite: isProd ? "none" : "lax",
         secure: isProd,
@@ -70,7 +72,7 @@ router.post("/auth/logout", (req, res, next) => {
 });
 
 // Current user
-router.get("/auth/me", async (req, res) => {
+router.get("/me", async (req, res) => {
   try {
     if (req.isAuthenticated && req.isAuthenticated()) {
       return res.json({
@@ -88,7 +90,5 @@ router.get("/auth/me", async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 });
-
-
 
 module.exports = router;

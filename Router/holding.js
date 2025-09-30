@@ -1,11 +1,10 @@
 const express = require("express");
 const Router = express.Router();
 
-const HoldingModel = require("../model/HoldingModel.js");
-const router = require("./user");
+const { HoldingModel } = require("../model/HoldingModel.js");
 
 // Holdings
-Router.get("/allholdings", async (req, res, next) => {
+Router.get("/", async (req, res, next) => {
   try {
     const holdings = await HoldingModel.find({});
     const total = await HoldingModel.countDocuments();
@@ -15,4 +14,4 @@ Router.get("/allholdings", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+module.exports = Router;

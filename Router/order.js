@@ -7,7 +7,7 @@ Router.post("/newOrder", async (req, res, next) => {
   try {
     const { name, qty, price, mode } = req.body;
     if (!name || !qty || !price || !mode) {
-      return res.status(401).json({ message: "please field all " });
+      return res.status(400).json({ message: "Please fill all fields" });
     }
 
     const newOrder = new OrderModel({ name, qty, price, mode });
@@ -19,7 +19,7 @@ Router.post("/newOrder", async (req, res, next) => {
   }
 });
 
-Router.get("/orders", async (req, res, next) => {
+Router.get("/", async (req, res, next) => {
   try {
     const orders = await OrderModel.find({});
     const total = await OrderModel.countDocuments();

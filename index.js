@@ -10,6 +10,7 @@ const User = require("./model/usersModel.js");
 const passport = require("passport");
 const LocalStragy = require("passport-local");
 
+
 const userRoute = require("./Router/user.js");
 const holdingRoute = require("./Router/holding.js");
 const PositionRoute = require("./Router/position.js");
@@ -22,7 +23,7 @@ const app = express();
 
 // CORS
 const corsOptions = {
-  origin: [process.env.FRONTEND_LINK, process.env.DASHBOARD_LINK],
+  origin: [process.env.FRONTEND_LINK, process.env.DASHBOARD_LINK, "*"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 };
@@ -42,8 +43,7 @@ const store = MongoStore.create({
 
 app.use(
   session({
-    secret:
-      process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
@@ -64,10 +64,10 @@ passport.use(new LocalStragy({ usernameField: "email" }, User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use("/auth", userRoute);
-app.use("/", holdingRoute);
-app.use("/", PositionRoute);
-app.use("/", orderRoute);
+app.use("/auth/", userRoute);
+app.use("/allholdings", holdingRoute);
+app.use("/allpositions", PositionRoute);
+app.use("/orders", orderRoute);
 
 // Error handler
 app.use((err, req, res, next) => {
